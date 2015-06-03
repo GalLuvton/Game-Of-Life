@@ -1,26 +1,35 @@
+ifndef DEBUG
+DEBUG = 0
+endif
+
+CFLAGS = -g -f elf
+
+ifneq ($(DEBUG),0)
+        CFLAGS += -D _print
+endif
 
 # All Targets
-all: ./bin/ass3
+all: ./ass3
 
 
-./bin/ass3: ./bin/scheduler.o ./bin/printer.o ./bin/coroutines.o ./bin/ass3.o
-	ld -g -melf_i386 -o ./bin/ass3 ./bin/scheduler.o ./bin/printer.o ./bin/coroutines.o ./bin/ass3.o
+./ass3: ./bin/scheduler.o ./bin/printer.o ./bin/coroutines.o ./bin/ass3.o
+	ld -g -melf_i386 -o ./ass3 ./bin/scheduler.o ./bin/printer.o ./bin/coroutines.o ./bin/ass3.o
 
 ./bin/scheduler.o: scheduler.s
-	nasm -g -f elf scheduler.s -o ./bin/scheduler.o
+	nasm $(CFLAGS) scheduler.s -o ./bin/scheduler.o
 
 ./bin/printer.o: printer.s
-	nasm -g -f elf printer.s -o ./bin/printer.o
+	nasm $(CFLAGS) printer.s -o ./bin/printer.o
 
 ./bin/coroutines.o: coroutines.s
-	nasm -g -f elf coroutines.s -o ./bin/coroutines.o
+	nasm $(CFLAGS) coroutines.s -o ./bin/coroutines.o
 
 ./bin/ass3.o: ass3.s
-	nasm -g -f elf ass3.s -o ./bin/ass3.o
+	nasm $(CFLAGS) ass3.s -o ./bin/ass3.o
 
 .PHONY:
 	clean
 
 #Clean the build directory
 clean:
-	rm -f ./bin/*.o ./bin/ass3
+	rm -f ./bin/*.o ./ass3

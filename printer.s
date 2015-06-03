@@ -39,8 +39,10 @@ section .text
 ; Implementation: initializes global values. loop over all cells, and get cell value (value is in char format). print given value.
 ;                 also prints a box around the board, for better board visability.
 printer:
-        call    newgen_loop                                     ; print the board upper wall
-        xor     eax, eax
+        %ifdef _print
+		call    newgen_loop                                     ; print the board upper wall
+        %endif
+		xor     eax, eax
         xor     ebx, ebx
 .loop_i:
         cmp     eax, dword [WorldLength]
@@ -66,10 +68,12 @@ printer:
 .loop_j_end:
         xor     ebx, ebx
         inc     eax                                             ; continue loop of i
-        pusha
+        %ifdef _print
+		pusha
         write   stdout, wall, 1                                 ; prints the board right wall
         popa
-        cmp     eax, dword [WorldLength]                        ; check that this is not the last line
+        %endif
+		cmp     eax, dword [WorldLength]                        ; check that this is not the last line
         je      .skip_newline
         pusha                                                   ; if it is, dont print a newline
         write   stdout, newline, 1
@@ -77,17 +81,22 @@ printer:
 .skip_newline:
         jmp     .loop_i
 .loop_i_end:
+		%ifdef _print
         call    newgen_loop                                     ; print the board lower wall
+		%endif
         xor     ebx, ebx
         call    resume                                          ; resume scheduler
         jmp     printer
 .line_start:
+		%ifdef _print
         pusha
         write   stdout, wall, 1                                 ; part of output formatting
         popa
+		%endif
         jmp     .ret_from_output_format
 
 
+%ifdef _print
 ; Logic: print the board upper/lower bound char ('*'), .
 ; Implementation: prints the board upper/lower bound char WorldWidth+2 times
 newgen_loop:
@@ -114,4 +123,5 @@ newgen_loop:
         mov     esp, ebp
         pop     ebp
         ret
+%endif
 
